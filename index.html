@@ -80,11 +80,50 @@
                 </div>
             </section>
 
+            <!-- 道具樣本庫 -->
+            <section class="panel">
+                <h2 class="panel-title">🎯 道具樣本庫</h2>
+
+                <div class="item-library-btns">
+                    <button id="add-sample-btn" type="button" class="add-sample-btn" disabled>
+                        ✂️ 截圖建立樣本
+                    </button>
+                    <button id="detect-items-btn" type="button" class="detect-items-btn" disabled>
+                        🔍 辨識道具
+                    </button>
+                </div>
+
+                <!-- 框選提示條 -->
+                <div id="selection-hint" class="selection-hint">
+                    <span class="selection-hint-dot"></span>
+                    在截圖上拖曳框選道具圖示，按 Esc 取消
+                </div>
+
+                <!-- 已儲存的道具模板列表 -->
+                <div id="item-template-list" class="item-template-list">
+                    <div class="no-templates-hint">
+                        尚無道具樣本<br>
+                        <span style="opacity:0.6">上傳截圖後點「截圖建立樣本」</span>
+                    </div>
+                </div>
+            </section>
+
         </aside>
 
         <!-- ===== 中央區域：Canvas ===== -->
         <section class="center-panel">
-            <div class="canvas-wrapper">
+
+            <!-- 縮放控制列 -->
+            <div class="canvas-zoom-bar">
+                <button id="zoom-out-btn" class="zoom-btn" title="縮小">－</button>
+                <span id="zoom-level-display" class="zoom-level">100%</span>
+                <button id="zoom-in-btn" class="zoom-btn" title="放大">＋</button>
+                <button id="zoom-reset-btn" class="zoom-reset-btn" title="重置為 100%">1:1</button>
+                <button id="zoom-fit-btn" class="zoom-reset-btn" title="縮放至符合視窗">⊡ 符合</button>
+                <span class="zoom-hint">Ctrl+滾輪 縮放</span>
+            </div>
+
+            <div class="canvas-wrapper" id="canvas-wrapper">
                 <div id="canvas-container" class="canvas-container">
                     <div id="canvas-placeholder" class="canvas-placeholder">
                         <div class="canvas-placeholder-icon">🎮</div>
@@ -130,6 +169,14 @@
                 </div>
             </section>
 
+            <!-- 道具辨識結果 -->
+            <section class="panel results-container" id="item-results-section" style="display:none">
+                <h2 class="panel-title">🎯 道具辨識結果</h2>
+                <div id="item-results-list" class="results-list">
+                    <div class="no-results">尚未辨識</div>
+                </div>
+            </section>
+
             <!-- 匯出 -->
             <section class="panel">
                 <h2 class="panel-title">💾 匯出資料</h2>
@@ -142,6 +189,44 @@
         </aside>
     </main>
 
+    <!-- ===== 道具樣本確認彈窗 ===== -->
+    <div id="item-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 class="modal-title">✂️ 建立道具樣本</h2>
+
+            <!-- 預覽：原始 vs 去除數字後 -->
+            <div class="modal-preview-row">
+                <div class="modal-preview-col">
+                    <div class="modal-preview-label">原始框選</div>
+                    <canvas id="modal-original-canvas" class="modal-preview-canvas"></canvas>
+                </div>
+                <div class="modal-preview-col">
+                    <div class="modal-preview-label">去除數字後</div>
+                    <canvas id="modal-clean-canvas" class="modal-preview-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- OCR 定位資訊 -->
+            <div id="modal-ocr-info" class="modal-ocr-info success">
+                <span>✓</span>
+                <span id="modal-ocr-text">OCR 精確定位數字區域</span>
+            </div>
+
+            <!-- 道具名稱輸入 -->
+            <div class="modal-input-group">
+                <label class="modal-input-label" for="modal-item-name">道具名稱（選填）</label>
+                <input id="modal-item-name" type="text" class="modal-input"
+                    placeholder="例：水晶、紫水晶…" maxlength="20">
+            </div>
+
+            <!-- 按鈕列 -->
+            <div class="modal-btns">
+                <button id="modal-cancel" type="button" class="modal-btn-cancel">取消</button>
+                <button id="modal-confirm" type="button" class="modal-btn-confirm">✅ 加入樣本庫</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== 狀態列 ===== -->
     <footer id="status-bar" class="status-bar loading">
         <span class="status-dot"></span>
@@ -152,6 +237,7 @@
     <!-- 應用程式模組（先載入，確保 onOpenCvReady 已定義） -->
     <script src="js/nms.js"></script>
     <script src="js/ocr-engine.js"></script>
+    <script src="js/item-detector.js"></script>
     <script src="js/app.js"></script>
 
     <!-- OpenCV.js (CDN) - 使用 Module.onRuntimeInitialized 確保 WASM 完全初始化 -->
@@ -163,7 +249,7 @@
             }
         };
     </script>
-    <script async src="https://docs.opencv.org/4.12.0/opencv.js" type="text/javascript"></script>
+    <script async src="opencv.js" type="text/javascript"></script>
 
 </body>
 </html>

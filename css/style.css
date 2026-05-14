@@ -65,6 +65,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+    padding-bottom: 36px; /* 避免 fixed status-bar 遮擋底部內容 */
 }
 
 /* 背景裝飾：像素網格紋理 */
@@ -158,6 +159,7 @@ body::before {
     grid-template-columns: 280px 1fr 260px;
     gap: 1rem;
     padding: 1rem 1.5rem;
+    /* header ≈ 70px，status-bar ≈ 36px（fixed，body 已有 padding-bottom 補足）*/
     max-height: calc(100vh - 70px - 36px);
     min-height: calc(100vh - 70px - 36px);
 }
@@ -471,8 +473,77 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .center-panel {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
     min-height: 0;
+}
+
+/* 縮放控制列 */
+.canvas-zoom-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.zoom-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    padding: 0;
+}
+
+.zoom-btn:hover {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.1);
+}
+
+.zoom-level {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    min-width: 3.2rem;
+    text-align: center;
+    font-family: var(--font-main);
+}
+
+.zoom-reset-btn {
+    padding: 0.2rem 0.55rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.zoom-reset-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(61, 139, 253, 0.1);
+}
+
+.zoom-hint {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    margin-left: auto;
 }
 
 .canvas-wrapper {
@@ -481,22 +552,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
-    overflow: auto;
+    overflow: auto;        /* 縮放後超出時顯示捲軸 */
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     min-height: 0;
+    padding: 0.5rem;
 }
 
 .canvas-container {
     position: relative;
     display: inline-block;
+    flex-shrink: 0;        /* 縮放後不被壓縮 */
 }
 
 .canvas-container canvas {
     display: block;
-    max-width: 100%;
-    height: auto;
+    /* 寬高由 JS 控制（style.width/height），不設 CSS 限制 */
 }
 
 #source-canvas {
@@ -802,4 +874,615 @@ input[type="range"]::-webkit-slider-thumb:hover {
     .stat-card.wide {
         grid-column: span 1;
     }
+}
+
+/* ========================================
+   道具模板庫（Item Template Library）
+   ======================================== */
+
+/* 模板庫按鈕群 */
+.item-library-btns {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.add-sample-btn {
+    flex: 1;
+    padding: 0.55rem 0.6rem;
+    background: linear-gradient(135deg, var(--accent-green), #3aaf8f);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.add-sample-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(78, 204, 163, 0.35);
+}
+
+.add-sample-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.detect-items-btn {
+    flex: 1;
+    padding: 0.55rem 0.6rem;
+    background: linear-gradient(135deg, #7c5cbf, #6344a8);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.detect-items-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(124, 92, 191, 0.4);
+}
+
+.detect-items-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 框選提示條 */
+.selection-hint {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.7rem;
+    background: rgba(78, 204, 163, 0.12);
+    border: 1px solid rgba(78, 204, 163, 0.4);
+    border-radius: var(--radius-sm);
+    font-size: 0.7rem;
+    color: var(--accent-green);
+    animation: fadeIn 0.2s ease;
+}
+
+.selection-hint.active {
+    display: flex;
+}
+
+.selection-hint-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    flex-shrink: 0;
+    animation: pulse-dot 1s infinite;
+}
+
+/* Canvas 框選模式：滑鼠變十字 */
+.canvas-container.selecting-mode {
+    cursor: crosshair;
+}
+
+/* 已儲存的模板列表 */
+.item-template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+}
+
+.item-template-card {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 0.5rem;
+    align-items: start;      /* 價格列展開後頂端對齊 */
+    padding: 0.45rem 0.6rem;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    transition: border-color var(--transition-fast);
+    animation: fadeIn 0.2s ease;
+}
+
+.item-template-card:hover {
+    border-color: var(--accent-green);
+}
+
+.item-template-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    background: #111;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+    margin-top: 0.15rem;  /* 頂端對齊 */
+}
+
+.item-template-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.item-template-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-template-meta {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+}
+
+.item-template-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.item-template-badge.ocr {
+    color: var(--accent-green);
+    background: rgba(78, 204, 163, 0.15);
+    border: 1px solid rgba(78, 204, 163, 0.3);
+}
+
+.item-template-badge.fallback {
+    color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.12);
+    border: 1px solid rgba(240, 192, 64, 0.3);
+}
+
+.item-template-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.2rem;
+    border-radius: 3px;
+    transition: all var(--transition-fast);
+    line-height: 1;
+    margin-top: 0.1rem;   /* 頂端對齊 */
+}
+
+.item-template-delete:hover {
+    color: var(--accent-red);
+    background: rgba(233, 69, 96, 0.12);
+}
+
+.no-templates-hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    padding: 1rem 0;
+    line-height: 1.6;
+}
+
+/* ========================================
+   道具確認彈窗（Item Confirm Modal）
+   ======================================== */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    width: 360px;
+    max-width: 90vw;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.25s ease;
+}
+
+@keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-title {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--accent-green);
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+/* 預覽區：原始 vs 去除數字後 */
+.modal-preview-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+}
+
+.modal-preview-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.modal-preview-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-preview-canvas {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: #111;
+    image-rendering: pixelated;
+    max-width: 100%;
+    max-height: 120px;
+    width: auto;
+    height: auto;
+}
+
+.modal-ocr-info {
+    font-size: 0.65rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.modal-ocr-info.success {
+    color: var(--accent-green);
+    background: rgba(78, 204, 163, 0.1);
+    border: 1px solid rgba(78, 204, 163, 0.25);
+}
+
+.modal-ocr-info.fallback {
+    color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.1);
+    border: 1px solid rgba(240, 192, 64, 0.25);
+}
+
+/* 名稱輸入 */
+.modal-input-group {
+    margin-bottom: 1rem;
+}
+
+.modal-input-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-family: var(--font-main);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.modal-input:focus {
+    border-color: var(--accent-green);
+}
+
+/* 彈窗按鈕列 */
+.modal-btns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.modal-btn-cancel {
+    flex: 1;
+    padding: 0.55rem;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.modal-btn-cancel:hover {
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+}
+
+.modal-btn-confirm {
+    flex: 2;
+    padding: 0.55rem;
+    background: linear-gradient(135deg, var(--accent-green), #3aaf8f);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.modal-btn-confirm:hover {
+    box-shadow: 0 4px 12px rgba(78, 204, 163, 0.35);
+    transform: translateY(-1px);
+}
+
+/* ========================================
+   道具辨識結果（Items Result）
+   ======================================== */
+
+.item-result-group {
+    margin-bottom: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    animation: fadeIn 0.2s ease;
+}
+
+.item-result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: var(--bg-hover);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.item-result-thumb {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    border-radius: 2px;
+}
+
+.item-result-name {
+    flex: 1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent-gold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-result-count-badge {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.item-result-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-result-row {
+    display: grid;
+    grid-template-columns: 24px 1fr auto auto auto; /* idx | pos | qty | conf | price */
+    gap: 0.4rem;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.72rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.item-result-row:last-child {
+    border-bottom: none;
+}
+
+.item-result-row:hover {
+    background: var(--bg-hover);
+}
+
+.item-result-row-idx {
+    color: var(--text-muted);
+    font-size: 0.62rem;
+}
+
+.item-result-qty {
+    font-weight: 700;
+    color: var(--accent-green);
+    font-size: 0.82rem;
+}
+
+.item-result-qty.unknown {
+    color: var(--text-muted);
+}
+
+.item-result-conf {
+    color: var(--text-muted);
+    font-size: 0.62rem;
+}
+
+/* ==========================================
+   道具模板卡片：單價輸入
+   ========================================== */
+
+/* 名稱內聯編輯輸入框 */
+.item-name-inline-input {
+    width: 100%;
+    padding: 0.1rem 0.3rem;
+    background: var(--bg-hover);
+    border: 1px solid var(--accent-green);
+    border-radius: 3px;
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    outline: none;
+}
+
+
+/* 單價列 */
+.item-price-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.item-price-label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+.item-price-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.15rem 0.35rem;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    color: var(--accent-gold);
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    text-align: right;
+    outline: none;
+    transition: border-color var(--transition-fast);
+    /* 隱藏 number 型輸入的上下箭頭 */
+    -moz-appearance: textfield;
+}
+
+.item-price-input::-webkit-outer-spin-button,
+.item-price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.item-price-input:focus {
+    border-color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.06);
+}
+
+.item-price-suffix {
+    font-size: 0.62rem;
+    color: var(--accent-gold);
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+/* ==========================================
+   道具辨識結果：小計 / 總計
+   ========================================== */
+
+/* 結果標題右側摘要 */
+.item-result-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+    flex-shrink: 0;
+}
+
+.item-result-total-qty {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.item-result-total-qty b {
+    color: var(--accent-green);
+    font-size: 0.75rem;
+}
+
+.item-result-subtotal {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+.item-result-no-price {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-style: italic;
+    white-space: nowrap;
+}
+
+/* 每行位置顯示 */
+.item-result-pos {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+}
+
+/* 每行價格 */
+.item-result-row-price {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* 全部總計區塊 */
+.item-result-grand-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    background: linear-gradient(135deg,
+        rgba(240, 192, 64, 0.12), rgba(240, 192, 64, 0.06));
+    border: 1px solid rgba(240, 192, 64, 0.35);
+    border-radius: var(--radius-sm);
+    animation: fadeIn 0.25s ease;
+}
+
+.grand-total-label {
+    font-size: 0.72rem;
+    color: var(--accent-gold);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.grand-total-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+    letter-spacing: 0.5px;
+    font-family: var(--font-main);
 }
