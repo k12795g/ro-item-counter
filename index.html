@@ -29,11 +29,19 @@
                 <h2 class="panel-title">⚙️ 參數設定</h2>
 
                 <div class="control-group">
-                    <div class="control-label">
-                        <span>匹配信心度</span>
+                    <div class="control-label" title="數字 OCR 的嚴格程度">
+                        <span>數字辨識信心度</span>
                         <span id="match-threshold-val" class="control-value">0.85</span>
                     </div>
                     <input id="match-threshold" type="range" min="0.5" max="0.99" step="0.01" value="0.85">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label" title="道具圖像匹配的嚴格程度">
+                        <span>道具匹配信心度</span>
+                        <span id="item-match-threshold-val" class="control-value">0.80</span>
+                    </div>
+                    <input id="item-match-threshold" type="range" min="0.5" max="0.99" step="0.01" value="0.80">
                 </div>
 
                 <div class="control-group">

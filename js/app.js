@@ -52,6 +52,8 @@ const App = {
             // 控制面板
             matchThreshold: document.getElementById('match-threshold'),
             matchThresholdVal: document.getElementById('match-threshold-val'),
+            itemMatchThreshold: document.getElementById('item-match-threshold'),
+            itemMatchThresholdVal: document.getElementById('item-match-threshold-val'),
             binaryThreshold: document.getElementById('binary-threshold'),
             binaryThresholdVal: document.getElementById('binary-threshold-val'),
             debugMode: document.getElementById('debug-mode'),
@@ -133,6 +135,9 @@ const App = {
         // 參數滑桿
         this.els.matchThreshold.addEventListener('input', (e) => {
             this.els.matchThresholdVal.textContent = e.target.value;
+        });
+        this.els.itemMatchThreshold.addEventListener('input', (e) => {
+            this.els.itemMatchThresholdVal.textContent = e.target.value;
         });
         this.els.binaryThreshold.addEventListener('input', (e) => {
             this.els.binaryThresholdVal.textContent = e.target.value;
@@ -1172,7 +1177,7 @@ const App = {
             // ── 步驟 2：道具模板匹配 ─────────────────────────────────────
             this.setStatus(`正在比對 ${templates.length} 種道具模板...`, 'loading');
             const matchOpts = {
-                itemMatchThreshold: 0.80,
+                itemMatchThreshold: parseFloat(this.els.itemMatchThreshold.value),
                 nmsIouThreshold: 0.4,
                 matchThreshold: parseFloat(this.els.matchThreshold.value),
                 binaryThreshold: parseInt(this.els.binaryThreshold.value)
