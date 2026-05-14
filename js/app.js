@@ -28,8 +28,50 @@ const App = {
      */
     init() {
         this.cacheElements();
+        this.loadSettings();
         this.bindEvents();
         this.initOpenCV();
+    },
+
+    /**
+     * 從 localStorage 載入使用者設定
+     */
+    loadSettings() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('roItemCounterSettings'));
+            if (saved) {
+                if (saved.matchThreshold !== undefined) {
+                    this.els.matchThreshold.value = saved.matchThreshold;
+                    this.els.matchThresholdVal.textContent = saved.matchThreshold;
+                }
+                if (saved.itemMatchThreshold !== undefined) {
+                    this.els.itemMatchThreshold.value = saved.itemMatchThreshold;
+                    this.els.itemMatchThresholdVal.textContent = saved.itemMatchThreshold;
+                }
+                if (saved.binaryThreshold !== undefined) {
+                    this.els.binaryThreshold.value = saved.binaryThreshold;
+                    this.els.binaryThresholdVal.textContent = saved.binaryThreshold;
+                }
+                if (saved.debugMode !== undefined) {
+                    this.els.debugMode.checked = saved.debugMode;
+                }
+            }
+        } catch (e) {
+            console.warn('載入設定失敗:', e);
+        }
+    },
+
+    /**
+     * 儲存使用者設定到 localStorage
+     */
+    saveSettings() {
+        const settings = {
+            matchThreshold: this.els.matchThreshold.value,
+            itemMatchThreshold: this.els.itemMatchThreshold.value,
+            binaryThreshold: this.els.binaryThreshold.value,
+            debugMode: this.els.debugMode.checked
+        };
+        localStorage.setItem('roItemCounterSettings', JSON.stringify(settings));
     },
 
     /**
@@ -135,12 +177,15 @@ const App = {
         // 參數滑桿
         this.els.matchThreshold.addEventListener('input', (e) => {
             this.els.matchThresholdVal.textContent = e.target.value;
+            this.saveSettings();
         });
         this.els.itemMatchThreshold.addEventListener('input', (e) => {
             this.els.itemMatchThresholdVal.textContent = e.target.value;
+            this.saveSettings();
         });
         this.els.binaryThreshold.addEventListener('input', (e) => {
             this.els.binaryThresholdVal.textContent = e.target.value;
+            this.saveSettings();
         });
 
         // 辨識按鈕
@@ -152,6 +197,7 @@ const App = {
 
         // 偵錯模式：切換時重新辨識以產生/隱藏偵錯圖
         this.els.debugMode.addEventListener('change', () => {
+            this.saveSettings();
             if (this.els.debugMode.checked) {
                 if (this.currentImage) this.runRecognition();
             } else {
