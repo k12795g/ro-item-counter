@@ -141,6 +141,17 @@
         <!-- ===== 右側面板：結果 ===== -->
         <aside class="right-panel">
 
+            <!-- 道具辨識結果（最重要，放最上方）-->
+            <section class="panel results-container" id="item-results-section">
+                <div class="item-results-header">
+                    <h2 class="panel-title" style="margin:0">🎯 道具辨識結果</h2>
+                    <div class="total-value-badge" id="total-value-badge">總計 <span id="total-value-display">—</span> z</div>
+                </div>
+                <div id="item-results-list" class="results-list">
+                    <div class="no-results">尚未辨識</div>
+                </div>
+            </section>
+
             <!-- 統計資訊 -->
             <section class="panel">
                 <h2 class="panel-title">📊 統計資訊</h2>
@@ -160,18 +171,10 @@
                 </div>
             </section>
 
-            <!-- 結果列表 -->
+            <!-- OCR 辨識結果 -->
             <section class="panel results-container">
-                <h2 class="panel-title">📋 辨識結果</h2>
+                <h2 class="panel-title">📋 OCR 結果</h2>
                 <div id="results-list" class="results-list">
-                    <div class="no-results">尚未辨識</div>
-                </div>
-            </section>
-
-            <!-- 道具辨識結果 -->
-            <section class="panel results-container" id="item-results-section" style="display:none">
-                <h2 class="panel-title">🎯 道具辨識結果</h2>
-                <div id="item-results-list" class="results-list">
                     <div class="no-results">尚未辨識</div>
                 </div>
             </section>

@@ -44,7 +44,11 @@
     --transition-fast: 0.15s ease;
     --transition-normal: 0.25s ease;
     --transition-slow: 0.4s ease;
+
+    /* 狀態列高度（全局統一）*/
+    --status-bar-h: 40px;
 }
+
 
 /* ---------- Reset & Base ---------- */
 *, *::before, *::after {
@@ -158,7 +162,7 @@ body::before {
     grid-template-columns: 260px 1fr 260px;
     gap: 0.8rem;
     padding: 0.8rem 1.5rem;
-    height: calc(100vh - 70px - 36px); /* header + status bar */
+    height: calc(100vh - 84px - var(--status-bar-h));
     min-height: 0;
     box-sizing: border-box;
 }
@@ -654,6 +658,39 @@ input[type="range"]::-webkit-slider-thumb:hover {
     gap: 1rem;
 }
 
+/* 道具辨識結果區：取得最多空間 */
+#item-results-section {
+    flex: 2 1 0;
+}
+
+/* 道具結果區頂部：標題 + 總金額 badge 橫排 */
+.item-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* 總金額顯示 badge */
+.total-value-badge {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.12);
+    border: 1px solid rgba(240, 192, 64, 0.35);
+    border-radius: var(--radius-sm);
+    padding: 0.2rem 0.7rem;
+    white-space: nowrap;
+}
+
+.total-value-badge span {
+    font-size: 1.1rem;
+}
+
 /* 統計卡片 */
 .stats-grid {
     display: grid;
@@ -785,8 +822,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     left: 0;
     right: 0;
     z-index: 100;
-    padding: 0.5rem 2rem;
-    font-size: 0.75rem;
+    height: var(--status-bar-h);
+    padding: 0 2rem;
+    font-size: 0.82rem;
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     display: flex;

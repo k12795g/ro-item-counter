@@ -434,6 +434,11 @@ const App = {
                         `辨識完成！找到 ${result.numbers.length} 組數字，耗時 ${result.processingTime.toFixed(1)}ms`,
                         'ready'
                     );
+
+                    // 若道具樣本庫有模板，自動接著辨識道具
+                    if (ItemDetector.loadTemplates().length > 0) {
+                        this.detectAllItems();
+                    }
                 } catch (err) {
                     console.error('辨識錯誤:', err);
                     this.setStatus(`辨識失敗：${err.message}`, 'error');
@@ -1507,12 +1512,18 @@ const App = {
             list.appendChild(groupEl);
         }
 
-        // 總計區
+        // 更新頂部獨立的總計顯示
+        const totalDisplay = document.getElementById('total-value-display');
+        if (totalDisplay) {
+            totalDisplay.textContent = grandHasPrice ? grandTotal.toLocaleString() : '—';
+        }
+
+        // 列表內的總計區
         if (grandHasPrice) {
             const totalEl = document.createElement('div');
             totalEl.className = 'item-result-grand-total';
             totalEl.innerHTML = `
-                <span class="grand-total-label">🐍 全部總價値</span>
+                <span class="grand-total-label">💰 全部總計</span>
                 <span class="grand-total-value">${grandTotal.toLocaleString()} z</span>`;
             list.appendChild(totalEl);
         }
