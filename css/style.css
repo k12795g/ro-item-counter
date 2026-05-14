@@ -63,9 +63,8 @@ body {
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow: hidden; /* 全局不滾動，內部各區各自滾動 */
     line-height: 1.6;
-    padding-bottom: 36px; /* 避免 fixed status-bar 遮擋底部內容 */
 }
 
 /* 背景裝飾：像素網格紋理 */
@@ -152,16 +151,39 @@ body::before {
 }
 
 /* ---------- Main Layout ---------- */
+/* 整體分兩列：上列三欄（上半畫面），下列道具樣本庫（下半畫面） */
 .main-layout {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: 280px 1fr 260px;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    /* header ≈ 70px，status-bar ≈ 36px（fixed，body 已有 padding-bottom 補足）*/
-    max-height: calc(100vh - 70px - 36px);
-    min-height: calc(100vh - 70px - 36px);
+    grid-template-columns: 260px minmax(200px, 560px) 260px;
+    gap: 0.8rem;
+    padding: 0.8rem 1.5rem 0;
+    /* 上列高度：视窗高度 - header(70px) - 下列(200px) - 狀態列(36px) - gap(0.8rem*2) - padding(0.8rem) */
+    height: calc(100vh - 70px - 200px - 36px - 2.4rem);
+    min-height: 0;
+}
+
+/* 下半部：道具樣本庫（在 body 中正常流） */
+.main-bottom {
+    position: relative;
+    z-index: 1;
+    margin: 0 1.5rem;
+    margin-bottom: calc(36px + 0.8rem); /* 不被狀態列遮擋 */
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+/* main-bottom 內的 header 列（標題 + 按鈕 + 提示條） */
+.item-library-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
 }
 
 /* ---------- Panel (通用) ---------- */
@@ -971,25 +993,44 @@ input[type="range"]::-webkit-slider-thumb:hover {
     cursor: crosshair;
 }
 
-/* 已儲存的模板列表 */
+/* 已儲存的模板列表（橫向排列） */
 .item-template-list {
     display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-top: 0.3rem;
+    flex-direction: row;
+    gap: 0.6rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+    align-items: stretch;
+    padding-bottom: 4px; /* 淮建滾動条間距 */
+}
+
+/* 滾動条樣式 */
+.item-template-list::-webkit-scrollbar {
+    height: 4px;
+}
+.item-template-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.item-template-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
 }
 
 .item-template-card {
-    display: grid;
-    grid-template-columns: 40px 1fr auto;
-    gap: 0.5rem;
-    align-items: start;      /* 價格列展開後頂端對齊 */
-    padding: 0.45rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 0.8rem;
     background: var(--bg-card);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     transition: border-color var(--transition-fast);
     animation: fadeIn 0.2s ease;
+    min-width: 110px;
+    flex-shrink: 0;
+    position: relative;
 }
 
 .item-template-card:hover {
@@ -997,67 +1038,110 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-template-thumb {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     image-rendering: pixelated;
     background: #111;
-    border-radius: 3px;
+    border-radius: 4px;
     border: 1px solid var(--border-color);
-    margin-top: 0.15rem;  /* 頂端對齊 */
 }
 
 .item-template-info {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    align-items: center;
+    gap: 0.2rem;
     min-width: 0;
+    width: 100%;
 }
 
 .item-template-name {
-    font-size: 0.75rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-primary);
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100px;
 }
 
 .item-template-meta {
-    font-size: 0.6rem;
+    font-size: 0.62rem;
     color: var(--text-muted);
 }
 
-.item-template-badge {
-    font-size: 0.55rem;
-    padding: 0.1rem 0.35rem;
-    border-radius: 3px;
+/* 橣排對齊的內嵌編輯輸入框 */
+.item-name-inline-input {
+    font-size: 0.82rem;
     font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--accent-green);
+    border-radius: 3px;
+    padding: 0.1rem 0.3rem;
+    width: 100%;
+    max-width: 100px;
+    text-align: center;
+    outline: none;
+    font-family: var(--font-main);
 }
 
-.item-template-badge.ocr {
-    color: var(--accent-green);
-    background: rgba(78, 204, 163, 0.15);
-    border: 1px solid rgba(78, 204, 163, 0.3);
+/* 價格行：全寬度 */
+.item-price-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+    width: 100%;
+    justify-content: center;
 }
 
-.item-template-badge.fallback {
+.item-price-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.item-price-input {
+    width: 70px;
+    padding: 0.25rem 0.4rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
     color: var(--accent-gold);
-    background: rgba(240, 192, 64, 0.12);
-    border: 1px solid rgba(240, 192, 64, 0.3);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    outline: none;
+    transition: border-color var(--transition-fast);
+    text-align: right;
 }
 
+.item-price-input:focus {
+    border-color: var(--accent-gold);
+}
+
+.item-price-suffix {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+
+/* 删除按鈕：卡片右上角絕對定位 */
 .item-template-delete {
+    position: absolute;
+    top: 4px;
+    right: 4px;
     background: none;
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 0.85rem;
-    padding: 0.2rem;
+    font-size: 0.8rem;
+    padding: 0.15rem 0.25rem;
     border-radius: 3px;
     transition: all var(--transition-fast);
     line-height: 1;
-    margin-top: 0.1rem;   /* 頂端對齊 */
 }
 
 .item-template-delete:hover {

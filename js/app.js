@@ -1057,14 +1057,10 @@ const App = {
                 });
             });
 
-            // 尺寸診斷資訊
+            // 尺寸資訊（小字）
             const metaEl = document.createElement('div');
             metaEl.className = 'item-template-meta';
             metaEl.textContent = `${tmpl.w}×${tmpl.h}px`;
-
-            const badgeEl = document.createElement('span');
-            badgeEl.className = `item-template-badge ${tmpl.usedOcr ? 'ocr' : 'fallback'}`;
-            badgeEl.textContent = tmpl.usedOcr ? 'OCR精準' : '固定遮蔽';
 
             // 單價輸入區
             const priceRow = document.createElement('div');
@@ -1086,12 +1082,10 @@ const App = {
             priceSuffix.className = 'item-price-suffix';
             priceSuffix.textContent = 'z';
 
-            // blur 或 Enter 儲存
             const savePrice = () => {
                 const val = parseFloat(priceInput.value);
                 const price = isNaN(val) || val < 0 ? null : Math.round(val);
                 ItemDetector.updateTemplate(tmpl.id, { price });
-                // 若輸入空白就清除
                 if (price === null) priceInput.value = '';
             };
             priceInput.addEventListener('blur', savePrice);
@@ -1103,12 +1097,12 @@ const App = {
             priceRow.appendChild(priceInput);
             priceRow.appendChild(priceSuffix);
 
+            // info：名稱 → meta → 單價
             info.appendChild(nameEl);
             info.appendChild(metaEl);
-            info.appendChild(badgeEl);
             info.appendChild(priceRow);
 
-            // 刪除按鈕
+            // 刪除按鈕（絕對定位於右上角，由 CSS 控制位置）
             const delBtn = document.createElement('button');
             delBtn.className = 'item-template-delete';
             delBtn.title = '刪除此道具樣本';
@@ -1121,9 +1115,10 @@ const App = {
                 }
             });
 
+            // 卡片結構：刪除鈕（絕對定位）→ 縮圖 → info
+            card.appendChild(delBtn);
             card.appendChild(thumb);
             card.appendChild(info);
-            card.appendChild(delBtn);
             container.appendChild(card);
         }
     },

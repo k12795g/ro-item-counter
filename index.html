@@ -80,34 +80,6 @@
                 </div>
             </section>
 
-            <!-- 道具樣本庫 -->
-            <section class="panel">
-                <h2 class="panel-title">🎯 道具樣本庫</h2>
-
-                <div class="item-library-btns">
-                    <button id="add-sample-btn" type="button" class="add-sample-btn" disabled>
-                        ✂️ 截圖建立樣本
-                    </button>
-                    <button id="detect-items-btn" type="button" class="detect-items-btn" disabled>
-                        🔍 辨識道具
-                    </button>
-                </div>
-
-                <!-- 框選提示條 -->
-                <div id="selection-hint" class="selection-hint">
-                    <span class="selection-hint-dot"></span>
-                    在截圖上拖曳框選道具圖示，按 Esc 取消
-                </div>
-
-                <!-- 已儲存的道具模板列表 -->
-                <div id="item-template-list" class="item-template-list">
-                    <div class="no-templates-hint">
-                        尚無道具樣本<br>
-                        <span style="opacity:0.6">上傳截圖後點「截圖建立樣本」</span>
-                    </div>
-                </div>
-            </section>
-
         </aside>
 
         <!-- ===== 中央區域：Canvas ===== -->
@@ -189,7 +161,33 @@
         </aside>
     </main>
 
-    <!-- ===== 道具樣本確認彈窗 ===== -->
+    <!-- ===== 下半部：道具樣本庫 ===== -->
+    <div class="main-bottom panel">
+        <div class="item-library-header">
+            <h2 class="panel-title" style="margin:0">🎯 道具樣本庫</h2>
+            <div class="item-library-btns">
+                <button id="add-sample-btn" type="button" class="add-sample-btn" disabled>
+                    ✂️ 截圖建立樣本
+                </button>
+                <button id="detect-items-btn" type="button" class="detect-items-btn" disabled>
+                    🔍 辨識道具
+                </button>
+            </div>
+            <!-- 框選提示條 -->
+            <div id="selection-hint" class="selection-hint">
+                <span class="selection-hint-dot"></span>
+                在截圖上拖曳框選道具圖示，按 Esc 取消
+            </div>
+        </div>
+        <!-- 已儲存的道具模板列表（橫向捲動）-->
+        <div id="item-template-list" class="item-template-list">
+            <div class="no-templates-hint">
+                尚無道具樣本<br>
+                <span style="opacity:0.6">上傳截圖後點「截圖建立樣本」</span>
+            </div>
+        </div>
+    </div>
+
     <div id="item-modal" class="modal-overlay">
         <div class="modal-box">
             <h2 class="modal-title">✂️ 建立道具樣本</h2>
