@@ -24,20 +24,6 @@
         <!-- ===== 左側面板：上傳 & 控制 ===== -->
         <aside class="left-panel">
 
-            <!-- 上傳區域 -->
-            <section class="panel">
-                <h2 class="panel-title">📁 上傳截圖</h2>
-                <div id="drop-zone" class="drop-zone">
-                    <div class="drop-zone-icon">🖼️</div>
-                    <div class="drop-zone-text">拖放圖片到這裡</div>
-                    <div class="drop-zone-hint">
-                        或按 <span class="shortcut-badge">Ctrl+V</span> 貼上
-                    </div>
-                    <button id="upload-btn" type="button" class="upload-btn">選擇檔案</button>
-                    <input id="file-input" type="file" accept="image/*" class="hidden-input">
-                </div>
-            </section>
-
             <!-- 參數控制 -->
             <section class="panel">
                 <h2 class="panel-title">⚙️ 參數設定</h2>
@@ -71,14 +57,6 @@
                 </button>
             </section>
 
-            <!-- 模板預覽 -->
-            <section class="panel">
-                <h2 class="panel-title">🔢 數字模板</h2>
-                <div id="template-preview" class="template-preview">
-                    <!-- 由 JS 動態填入 -->
-                    <div class="no-results" style="font-size:0.7rem">載入中...</div>
-                </div>
-            </section>
 
         </aside>
 
@@ -96,14 +74,18 @@
             </div>
 
             <div class="canvas-wrapper" id="canvas-wrapper">
-                <div id="canvas-container" class="canvas-container">
-                    <div id="canvas-placeholder" class="canvas-placeholder">
-                        <div class="canvas-placeholder-icon">🎮</div>
-                        <div class="canvas-placeholder-text">上傳 RO 遊戲截圖開始辨識</div>
-                        <div class="canvas-placeholder-hint">
-                            支援拖放、按鈕上傳或 <span class="shortcut-badge">Ctrl+V</span> 貼上
-                        </div>
+                <div id="canvas-placeholder" class="canvas-placeholder">
+                    <div class="canvas-placeholder-icon">🖼️</div>
+                    <div class="canvas-placeholder-text">拖放 RO 遊戲截圖到這裡</div>
+                    <div class="canvas-placeholder-hint">
+                        或按 <span class="shortcut-badge">Ctrl+V</span> 貼上
                     </div>
+                    <div style="margin-top: 1rem;">
+                        <button id="upload-btn" type="button" class="upload-btn">選擇檔案</button>
+                        <input id="file-input" type="file" accept="image/*" class="hidden-input">
+                    </div>
+                </div>
+                <div id="canvas-container" class="canvas-container">
                     <canvas id="source-canvas"></canvas>
                     <canvas id="result-canvas"></canvas>
                 </div>

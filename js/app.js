@@ -38,7 +38,7 @@ const App = {
     cacheElements() {
         this.els = {
             // 上傳區域
-            dropZone: document.getElementById('drop-zone'),
+            dropZone: document.getElementById('canvas-wrapper'),
             fileInput: document.getElementById('file-input'),
             uploadBtn: document.getElementById('upload-btn'),
 
@@ -70,8 +70,6 @@ const App = {
             statusText: document.getElementById('status-text'),
             cvStatus: document.getElementById('cv-status'),
 
-            // 模板預覽
-            templatePreview: document.getElementById('template-preview'),
 
             // 道具樣本庫
             addSampleBtn: document.getElementById('add-sample-btn'),
@@ -236,9 +234,6 @@ const App = {
      */
     async loadTemplates() {
         this.templates = [];
-        const previewContainer = this.els.templatePreview;
-        previewContainer.innerHTML = '';
-
         for (let digit = 0; digit <= 9; digit++) {
             try {
                 const cacheBuster = Date.now();
@@ -257,19 +252,6 @@ const App = {
 
                 this.templates.push({ digit, binary, width: img.naturalWidth, height: img.naturalHeight });
 
-                // 模板預覽 UI
-                const preview = document.createElement('div');
-                preview.className = 'template-item';
-                preview.innerHTML = `<span class="template-digit">${digit}</span>`;
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = img.naturalWidth * 4;
-                previewCanvas.height = img.naturalHeight * 4;
-                previewCanvas.style.imageRendering = 'pixelated';
-                const pCtx = previewCanvas.getContext('2d');
-                pCtx.imageSmoothingEnabled = false;
-                pCtx.drawImage(img, 0, 0, img.naturalWidth * 4, img.naturalHeight * 4);
-                preview.appendChild(previewCanvas);
-                previewContainer.appendChild(preview);
 
                 mat.delete();
             } catch (err) {
@@ -782,6 +764,11 @@ const App = {
         this.els.selectionHint.classList.add('active');
         // result-canvas 需要 pointer-events 才能接收滑鼠事件
         this.els.resultCanvas.style.pointerEvents = 'auto';
+
+        // 清空所有辨識標示，提供乾淨的截圖畫面
+        const ctx = this.els.resultCanvas.getContext('2d');
+        ctx.clearRect(0, 0, this.els.resultCanvas.width, this.els.resultCanvas.height);
+
         this.setStatus('框選模式：在截圖上拖曳框選道具圖示', 'loading');
     },
 
@@ -795,9 +782,13 @@ const App = {
         this.els.canvasContainer.classList.remove('selecting-mode');
         this.els.selectionHint.classList.remove('active');
         this.els.resultCanvas.style.pointerEvents = 'none';
-        // 清除框選框線
-        if (this.lastResult) this.drawResults(this.lastResult);
-        else {
+
+        // 恢復原本的標示
+        if (this.lastItemResults) {
+            this.drawItemResults(this.lastItemResults);
+        } else if (this.lastResult) {
+            this.drawResults(this.lastResult);
+        } else {
             const ctx = this.els.resultCanvas.getContext('2d');
             ctx.clearRect(0, 0, this.els.resultCanvas.width, this.els.resultCanvas.height);
         }
@@ -853,6 +844,13 @@ const App = {
         this.els.selectionHint.classList.remove('active');
         this.els.resultCanvas.style.pointerEvents = 'none';
 
+        // 恢復原本的標示
+        if (this.lastItemResults) {
+            this.drawItemResults(this.lastItemResults);
+        } else if (this.lastResult) {
+            this.drawResults(this.lastResult);
+        }
+
         // 執行模板建立（OCR 去除數字）
         this.buildItemTemplate(rect);
     },
@@ -863,7 +861,7 @@ const App = {
     drawSelectionRect() {
         const ctx = this.els.resultCanvas.getContext('2d');
         ctx.clearRect(0, 0, this.els.resultCanvas.width, this.els.resultCanvas.height);
-        if (this.lastResult) this.drawResults(this.lastResult);
+        // 框選時不繪製其他標示，保持畫面乾淨
 
         if (!this.selectionStart || !this.selectionEnd) return;
         const { x, y, w, h } = this.normalizeRect(this.selectionStart, this.selectionEnd);
@@ -1062,10 +1060,7 @@ const App = {
                 });
             });
 
-            // 尺寸資訊（小字）
-            const metaEl = document.createElement('div');
-            metaEl.className = 'item-template-meta';
-            metaEl.textContent = `${tmpl.w}×${tmpl.h}px`;
+
 
             // 單價輸入區
             const priceRow = document.createElement('div');
@@ -1102,9 +1097,8 @@ const App = {
             priceRow.appendChild(priceInput);
             priceRow.appendChild(priceSuffix);
 
-            // info：名稱 → meta → 單價
+            // info：名稱 → 單價
             info.appendChild(nameEl);
-            info.appendChild(metaEl);
             info.appendChild(priceRow);
 
             // 刪除按鈕（絕對定位於右上角，由 CSS 控制位置）

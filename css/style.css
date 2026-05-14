@@ -562,6 +562,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
     justify-content: flex-start;
     min-height: 0;
     padding: 0.5rem;
+    transition: all var(--transition-normal);
+}
+
+.canvas-wrapper.drag-over {
+    border-color: var(--accent-gold);
+    background: rgba(240, 192, 64, 0.05);
+    box-shadow: inset 0 0 30px rgba(240, 192, 64, 0.1);
 }
 
 /* 道具樣本庫（中間欄下半） */
@@ -587,6 +594,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     position: relative;
     display: inline-block;
     flex-shrink: 0;        /* 縮放後不被壓縮 */
+    margin: auto;          /* 讓圖片在畫布區置中顯示 */
 }
 
 .canvas-container canvas {
@@ -621,6 +629,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
     text-align: center;
     padding: 3rem;
     color: var(--text-muted);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
 }
 
 .canvas-placeholder-icon {
@@ -1063,7 +1076,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border: 1px solid var(--border-color);
     transition: border-color var(--transition-fast);
     animation: fadeIn 0.2s ease;
-    min-width: 130px;
+    min-width: 150px;
     flex-shrink: 0;
     position: relative;
 }
@@ -1140,14 +1153,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-price-input {
-    width: 80px;
-    padding: 0.3rem 0.5rem;
+    width: 110px;
+    padding: 0.4rem 0.6rem;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: 3px;
     color: var(--accent-gold);
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     font-family: var(--font-main);
     outline: none;
     transition: border-color var(--transition-fast);
