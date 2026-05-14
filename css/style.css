@@ -54,7 +54,7 @@
 }
 
 html {
-    font-size: 14px;
+    font-size: 16px;
     scroll-behavior: smooth;
 }
 
@@ -103,7 +103,7 @@ body::before {
 
 .header-title h1 {
     font-family: var(--font-pixel);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     letter-spacing: 1px;
     background: linear-gradient(135deg, var(--accent-gold), #ffdd70);
     -webkit-background-clip: text;
@@ -189,7 +189,7 @@ body::before {
 
 .panel-title {
     font-family: var(--font-pixel);
-    font-size: 0.6rem;
+    font-size: 0.72rem;
     color: var(--accent-gold);
     letter-spacing: 1px;
     margin-bottom: 0.8rem;
@@ -282,7 +282,7 @@ body::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.75rem;
+    font-size: 0.88rem;
     color: var(--text-secondary);
     margin-bottom: 0.3rem;
 }
@@ -378,13 +378,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* 辨識按鈕 */
 .recognize-btn {
     width: 100%;
-    padding: 0.7rem;
+    padding: 0.75rem;
     background: linear-gradient(135deg, var(--accent-red), #d13550);
     color: #fff;
     border: none;
     border-radius: var(--radius-md);
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all var(--transition-fast);
     letter-spacing: 1px;
@@ -562,7 +562,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 /* 道具樣本庫（中間欄下半） */
 .item-library-panel {
-    flex: 0 0 185px;       /* 固定高度 185px */
+    flex: 0 0 250px;       /* 擴大至 250px */
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
@@ -674,7 +674,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .stat-label {
-    font-size: 0.6rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -682,13 +682,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .stat-value {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--accent-gold);
 }
 
 .stat-card.wide .stat-value {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     color: var(--accent-green);
 }
 
@@ -710,13 +710,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
     grid-template-columns: 28px 1fr auto auto;
     gap: 0.3rem;
     align-items: center;
-    padding: 0.4rem 0.6rem;
+    padding: 0.5rem 0.7rem;
     background: var(--bg-card);
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     cursor: pointer;
     transition: all var(--transition-fast);
-    font-size: 0.75rem;
+    font-size: 0.88rem;
 }
 
 .result-item:hover {
@@ -732,17 +732,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .result-value {
     font-weight: 700;
     color: var(--accent-gold);
-    font-size: 0.85rem;
+    font-size: 1rem;
 }
 
 .result-pos {
     color: var(--text-muted);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
 }
 
 .result-conf {
     color: var(--accent-green);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 500;
 }
 
@@ -908,13 +908,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .add-sample-btn {
     flex: 1;
-    padding: 0.55rem 0.6rem;
+    padding: 0.6rem 0.8rem;
     background: linear-gradient(135deg, var(--accent-green), #3aaf8f);
     color: var(--bg-primary);
     border: none;
     border-radius: var(--radius-sm);
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.88rem;
     cursor: pointer;
     transition: all var(--transition-fast);
     letter-spacing: 0.5px;
@@ -934,13 +934,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .detect-items-btn {
     flex: 1;
-    padding: 0.55rem 0.6rem;
+    padding: 0.6rem 0.8rem;
     background: linear-gradient(135deg, #7c5cbf, #6344a8);
     color: #fff;
     border: none;
     border-radius: var(--radius-sm);
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.88rem;
     cursor: pointer;
     transition: all var(--transition-fast);
     letter-spacing: 0.5px;
@@ -1025,7 +1025,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border: 1px solid var(--border-color);
     transition: border-color var(--transition-fast);
     animation: fadeIn 0.2s ease;
-    min-width: 110px;
+    min-width: 130px;
     flex-shrink: 0;
     position: relative;
 }
@@ -1035,8 +1035,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-template-thumb {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
     image-rendering: pixelated;
     background: #111;
@@ -1054,18 +1054,18 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-template-name {
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-primary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px;
+    max-width: 120px;
 }
 
 .item-template-meta {
-    font-size: 0.62rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
 }
 
@@ -1096,19 +1096,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-price-label {
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
     white-space: nowrap;
 }
 
 .item-price-input {
-    width: 70px;
-    padding: 0.25rem 0.4rem;
+    width: 80px;
+    padding: 0.3rem 0.5rem;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: 3px;
     color: var(--accent-gold);
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     font-weight: 600;
     font-family: var(--font-main);
     outline: none;
@@ -1121,7 +1121,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .item-price-suffix {
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
 }
 
