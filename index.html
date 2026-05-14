@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RO 仙境傳說道具數量辨識工具 - 使用 OpenCV.js 模板匹配辨識截圖中的物品數量">
+    <title>RO 道具數量辨識器</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ===== 頂部導覽列 ===== -->
+    <header class="header">
+        <div class="header-title">
+            <h1>⚔️ RO 道具數量辨識器</h1>
+            <span class="header-badge">v1.0</span>
+        </div>
+        <span id="cv-status" class="cv-status loading">載入中...</span>
+    </header>
+
+    <!-- ===== 主要佈局 ===== -->
+    <main class="main-layout">
+
+        <!-- ===== 左側面板：上傳 & 控制 ===== -->
+        <aside class="left-panel">
+
+            <!-- 上傳區域 -->
+            <section class="panel">
+                <h2 class="panel-title">📁 上傳截圖</h2>
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-icon">🖼️</div>
+                    <div class="drop-zone-text">拖放圖片到這裡</div>
+                    <div class="drop-zone-hint">
+                        或按 <span class="shortcut-badge">Ctrl+V</span> 貼上
+                    </div>
+                    <button id="upload-btn" type="button" class="upload-btn">選擇檔案</button>
+                    <input id="file-input" type="file" accept="image/*" class="hidden-input">
+                </div>
+            </section>
+
+            <!-- 參數控制 -->
+            <section class="panel">
+                <h2 class="panel-title">⚙️ 參數設定</h2>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>匹配信心度</span>
+                        <span id="match-threshold-val" class="control-value">0.85</span>
+                    </div>
+                    <input id="match-threshold" type="range" min="0.5" max="0.99" step="0.01" value="0.85">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>二值化閾值</span>
+                        <span id="binary-threshold-val" class="control-value">25</span>
+                    </div>
+                    <input id="binary-threshold" type="range" min="5" max="100" step="1" value="25">
+                </div>
+
+                <div class="switch-group">
+                    <span>偵錯模式</span>
+                    <label class="switch">
+                        <input id="debug-mode" type="checkbox">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <button id="recognize-btn" type="button" class="recognize-btn" disabled>
+                    🔍 開始辨識
+                </button>
+            </section>
+
+            <!-- 模板預覽 -->
+            <section class="panel">
+                <h2 class="panel-title">🔢 數字模板</h2>
+                <div id="template-preview" class="template-preview">
+                    <!-- 由 JS 動態填入 -->
+                    <div class="no-results" style="font-size:0.7rem">載入中...</div>
+                </div>
+            </section>
+
+        </aside>
+
+        <!-- ===== 中央區域：Canvas ===== -->
+        <section class="center-panel">
+            <div class="canvas-wrapper">
+                <div id="canvas-container" class="canvas-container">
+                    <div id="canvas-placeholder" class="canvas-placeholder">
+                        <div class="canvas-placeholder-icon">🎮</div>
+                        <div class="canvas-placeholder-text">上傳 RO 遊戲截圖開始辨識</div>
+                        <div class="canvas-placeholder-hint">
+                            支援拖放、按鈕上傳或 <span class="shortcut-badge">Ctrl+V</span> 貼上
+                        </div>
+                    </div>
+                    <canvas id="source-canvas"></canvas>
+                    <canvas id="result-canvas"></canvas>
+                </div>
+            </div>
+            <canvas id="debug-canvas"></canvas>
+        </section>
+
+        <!-- ===== 右側面板：結果 ===== -->
+        <aside class="right-panel">
+
+            <!-- 統計資訊 -->
+            <section class="panel">
+                <h2 class="panel-title">📊 統計資訊</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">辨識數量</div>
+                        <div id="result-count" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">處理耗時</div>
+                        <div id="processing-time" class="stat-value">—</div>
+                    </div>
+                    <div class="stat-card wide">
+                        <div class="stat-label">數量總和</div>
+                        <div id="total-sum" class="stat-value">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 結果列表 -->
+            <section class="panel results-container">
+                <h2 class="panel-title">📋 辨識結果</h2>
+                <div id="results-list" class="results-list">
+                    <div class="no-results">尚未辨識</div>
+                </div>
+            </section>
+
+            <!-- 匯出 -->
+            <section class="panel">
+                <h2 class="panel-title">💾 匯出資料</h2>
+                <div class="export-group">
+                    <button id="export-csv" type="button" class="export-btn">📄 CSV</button>
+                    <button id="export-json" type="button" class="export-btn">📋 JSON</button>
+                </div>
+            </section>
+
+        </aside>
+    </main>
+
+    <!-- ===== 狀態列 ===== -->
+    <footer id="status-bar" class="status-bar loading">
+        <span class="status-dot"></span>
+        <span id="status-text" class="status-text">正在載入 OpenCV.js...</span>
+    </footer>
+
+    <!-- ===== Scripts ===== -->
+    <!-- 應用程式模組（先載入，確保 onOpenCvReady 已定義） -->
+    <script src="js/nms.js"></script>
+    <script src="js/ocr-engine.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- OpenCV.js (CDN) - 使用 Module.onRuntimeInitialized 確保 WASM 完全初始化 -->
+    <script type="text/javascript">
+        var Module = {
+            onRuntimeInitialized: function() {
+                console.log('OpenCV.js WASM 已完全初始化');
+                onOpenCvReady();
+            }
+        };
+    </script>
+    <script async src="https://docs.opencv.org/4.12.0/opencv.js" type="text/javascript"></script>
+
+</body>
+</html>
