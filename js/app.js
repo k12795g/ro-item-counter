@@ -118,6 +118,8 @@ const App = {
             // 道具樣本庫
             addSampleBtn: document.getElementById('add-sample-btn'),
             detectItemsBtn: document.getElementById('detect-items-btn'),
+            exportLibraryBtn: document.getElementById('export-library-btn'),
+            importLibraryInput: document.getElementById('import-library-input'),
             selectionHint: document.getElementById('selection-hint'),
             itemTemplateList: document.getElementById('item-template-list'),
             itemResultsSection: document.getElementById('item-results-section'),
@@ -212,6 +214,12 @@ const App = {
 
         // 辨識道具數量按鈕
         this.els.detectItemsBtn.addEventListener('click', () => this.detectAllItems());
+
+        // 匯出樣本庫
+        this.els.exportLibraryBtn.addEventListener('click', () => this.exportLibrary());
+
+        // 匯入樣本庫
+        this.els.importLibraryInput.addEventListener('change', (e) => this.importLibrary(e));
 
         // Canvas 框選事件（在 result-canvas 上操作，因為它覆蓋在 source-canvas 上方）
         const rc = this.els.resultCanvas;
@@ -735,13 +743,131 @@ const App = {
      * 下載檔案
      */
     downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
+        // content 可以是 Blob（ZIP）或字串（CSV/JSON）
+        const blob = content instanceof Blob
+            ? content
+            : new Blob([content], { type: mimeType });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         a.click();
         URL.revokeObjectURL(url);
+    },
+
+    // =========================================================
+    // 樣本庫 匯出 / 匯入
+    // =========================================================
+
+    /**
+     * 匯出樣本庫為 ZIP（包含所有道具圖片 + items.json）
+     */
+    async exportLibrary() {
+        const templates = ItemDetector.loadTemplates();
+        if (templates.length === 0) {
+            this.setStatus('樣本庫是空的，無法匯出', 'error');
+            return;
+        }
+        if (typeof JSZip === 'undefined') {
+            this.setStatus('JSZip 尚未載入，請稍後再試', 'error');
+            return;
+        }
+
+        this.setStatus('正在打包樣本庫...', 'loading');
+        const zip = new JSZip();
+
+        // 匯出 metadata JSON
+        const meta = templates.map(t => ({
+            id:        t.id,
+            name:      t.name,
+            price:     t.price ?? null,
+            filename:  `${t.id}.png`,
+            w:         t.w,
+            h:         t.h,
+            createdAt: t.createdAt
+        }));
+        zip.file('items.json', JSON.stringify(meta, null, 2));
+
+        // 匯出每張圖片（dataUrl → binary）
+        for (const t of templates) {
+            // dataUrl 格式: "data:image/png;base64,xxxxx"
+            const base64 = t.dataUrl.split(',')[1];
+            zip.file(`${t.id}.png`, base64, { base64: true });
+        }
+
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const ts = new Date().toISOString().slice(0, 10);
+        this.downloadFile(blob, `ro_library_${ts}.zip`, 'application/zip');
+        this.setStatus(`✓ 已匯出 ${templates.length} 筆道具樣本`, 'ready');
+    },
+
+    /**
+     * 從 ZIP 匯入樣本庫（合併到現有資料，ID 不重複則新增）
+     * @param {Event} e - file input change 事件
+     */
+    async importLibrary(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        // 重設 input 以便重複選同一個檔案
+        e.target.value = '';
+
+        if (typeof JSZip === 'undefined') {
+            this.setStatus('JSZip 尚未載入，請稍後再試', 'error');
+            return;
+        }
+
+        this.setStatus('正在讀取 ZIP...', 'loading');
+        try {
+            const zip = await JSZip.loadAsync(file);
+
+            // 讀取 items.json
+            const metaFile = zip.file('items.json');
+            if (!metaFile) {
+                this.setStatus('ZIP 內找不到 items.json，請確認是否為正確的樣本庫', 'error');
+                return;
+            }
+            const meta = JSON.parse(await metaFile.async('text'));
+
+            const existing = ItemDetector.loadTemplates();
+            const existingIds = new Set(existing.map(t => t.id));
+            let added = 0;
+
+            for (const item of meta) {
+                if (existingIds.has(item.id)) continue; // 已存在則跳過
+
+                const imgFile = zip.file(item.filename);
+                if (!imgFile) continue;
+
+                const base64 = await imgFile.async('base64');
+                const dataUrl = `data:image/png;base64,${base64}`;
+
+                existing.push({
+                    id:         item.id,
+                    name:       item.name,
+                    price:      item.price ?? null,
+                    dataUrl,
+                    w:          item.w,
+                    h:          item.h,
+                    maskedRects: item.maskedRects ?? [],
+                    usedOcr:    item.usedOcr ?? false,
+                    createdAt:  item.createdAt
+                });
+                added++;
+            }
+
+            localStorage.setItem(ItemDetector.STORAGE_KEY, JSON.stringify(existing));
+            this.renderItemTemplateList();
+
+            // 有截圖 + 有模板 → 啟用辨識按鈕
+            if (this.currentImage && existing.length > 0) {
+                this.els.detectItemsBtn.disabled = false;
+            }
+
+            this.setStatus(`✓ 匯入完成，新增 ${added} 筆，跳過 ${meta.length - added} 筆（已存在）`, 'ready');
+        } catch (err) {
+            console.error('匯入失敗:', err);
+            this.setStatus(`匯入失敗：${err.message}`, 'error');
+        }
     },
 
     /**

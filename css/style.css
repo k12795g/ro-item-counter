@@ -1014,6 +1014,46 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transform: none;
 }
 
+.export-library-btn {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    background: linear-gradient(135deg, var(--accent-blue), #2a7ce6);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.export-library-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(61, 139, 253, 0.4);
+}
+
+.import-library-label {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.8rem;
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+}
+
+.import-library-label:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
 /* 框選提示條 */
 .selection-hint {
     display: none;

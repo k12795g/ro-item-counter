@@ -111,6 +111,13 @@
                         <button id="detect-items-btn" type="button" class="detect-items-btn" disabled>
                             🔍 辨識道具
                         </button>
+                        <button id="export-library-btn" type="button" class="export-library-btn">
+                            📤 匯出樣本庫
+                        </button>
+                        <label class="import-library-label">
+                            📥 匯入樣本庫
+                            <input id="import-library-input" type="file" accept=".zip" class="hidden-input">
+                        </label>
                     </div>
                     <!-- 框選提示條 -->
                     <div id="selection-hint" class="selection-hint">
@@ -225,6 +232,8 @@
     </footer>
 
     <!-- ===== Scripts ===== -->
+    <!-- JSZip for export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- 應用程式模組（先載入，確保 onOpenCvReady 已定義） -->
     <script src="js/nms.js"></script>
     <script src="js/ocr-engine.js"></script>
